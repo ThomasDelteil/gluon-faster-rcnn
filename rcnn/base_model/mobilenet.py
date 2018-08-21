@@ -3,13 +3,13 @@ from mxnet.gluon import nn
 from mxnet.gluon import HybridBlock
 
 
-class VGGConvBlock(HybridBlock):
+class MobileNetConvBlock(HybridBlock):
 
     def __init__(self, base_model, **kwargs):
-        super(VGGConvBlock, self).__init__(**kwargs)
+        super(MobileNetConvBlock, self).__init__(**kwargs)
         self.features = nn.HybridSequential()
         # Exclude last 5 vgg feature layers (1 max pooling + 2 * (fc + dropout))
-        for layer in base_model.features[:-5]:
+        for layer in base_model.features[:16]:
             self.features.add(layer)
 
     def hybrid_forward(self, F, x, *args, **kwargs):
@@ -17,23 +17,24 @@ class VGGConvBlock(HybridBlock):
         return x
 
 
-class VGGFastRCNNHead(HybridBlock):
+class MobileNetFastRCNNHead(HybridBlock):
 
     def __init__(self, base_model, num_classes, feature_stride, **kwargs):
-        super(VGGFastRCNNHead, self).__init__(**kwargs)
+        super(MobileNetFastRCNNHead, self).__init__(**kwargs)
         self.feature_stride = feature_stride
         self.fc_layers = nn.HybridSequential()
         # Include last 4 vgg feature layers (2 * (fc + dropout))
-        for layer in base_model.features[-4:]:
+        for layer in base_model.features[16:]:
             self.fc_layers.add(layer)
-        self.cls_score = nn.Dense(in_units=4096, units=num_classes, weight_initializer=initializer.Normal(0.01))
-        self.bbox_pred = nn.Dense(in_units=4096, units=num_classes * 4, weight_initializer=initializer.Normal(0.001))
+        self.cls_score = nn.Dense(in_units=1280, units=num_classes, weight_initializer=initializer.Normal(0.01))
+        self.bbox_pred = nn.Dense(in_units=1280, units=num_classes * 4, weight_initializer=initializer.Normal(0.001))
 
     # noinspection PyMethodOverriding
     def hybrid_forward(self, F, feature_map, rois):
         x = F.ROIPooling(data=feature_map, rois=rois, pooled_size=(7, 7), spatial_scale=1.0/self.feature_stride)
-        x = F.flatten(data=x)  # shape(roi_num, 512*7*7)
-        x = self.fc_layers(x)
+        #print(x.shape)
+        #x = F.flatten(data=x)  # shape(roi_num, 512*7*7)
+        x = self.fc_layers(x).reshape((0, -1))
         cls_score = self.cls_score(x)
         cls_prob = F.softmax(data=cls_score)  # shape(roi_num, num_classes)
         bbox_pred = self.bbox_pred(x)  # shape(roi_num, num_classes*4)

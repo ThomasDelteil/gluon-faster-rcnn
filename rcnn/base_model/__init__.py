@@ -1,4 +1,5 @@
 from .vgg import *
+from .mobilenet import *
 
 
 def get_model_conv_block(name, **kwargs):
@@ -9,7 +10,8 @@ def get_model_conv_block(name, **kwargs):
         The base_model convolution part
     """
     models = {
-        'vgg16': VGGConvBlock
+        'vgg16': VGGConvBlock,
+        'mobilenetv2_0.5': MobileNetConvBlock
     }
     name = name.lower()
     if name not in models:
@@ -27,7 +29,8 @@ def get_model_rcnn_block(name, **kwargs):
         The base_model convolution part
     """
     models = {
-        'vgg16': VGGFastRCNNHead
+        'vgg16': VGGFastRCNNHead,
+        'mobilenetv2_0.5': MobileNetFastRCNNHead
     }
     name = name.lower()
     if name not in models:

@@ -1,7 +1,7 @@
 import random as pyrandom
 import numpy as np
 import mxnet as mx
-from .config import vgg16_fixed_params
+from .config import vgg16_fixed_params, mobilenet_fixed_params
 from .logger import logger
 
 __all__ = ['set_random_seed', 'fix_net_params']
@@ -33,8 +33,10 @@ def fix_net_params(net, name='vgg16'):
     Fix network parameters, fixed_params defined in ./config.py
     """
     fixed_params = {
-        'vgg16': vgg16_fixed_params
+        'vgg16': vgg16_fixed_params,
+        'mobilenetv2_0.5': mobilenet_fixed_params
     }
+        
     if name not in fixed_params:
         raise ValueError(
             'Model %s does not configure fixed parameters. Available options are\n\t%s' % (

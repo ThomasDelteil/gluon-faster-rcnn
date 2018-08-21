@@ -44,10 +44,10 @@ default.roi_fg_threshold = 0.5
 default.roi_bg_threshold_hi = 0.5
 default.roi_bg_threshold_lo = 0.0
 # Hyper Parameters
-default.batch_size = 2
+default.batch_size = 32
 default.start_epoch = 0
 default.end_epoch = 10
-default.lr = 0.001
+default.lr = 0.005
 default.lr_decay = 0.1
 default.lr_decay_epochs = (7,)
 default.wd = 0.0005
@@ -58,7 +58,7 @@ default.model_params = 'model/faster-rcnn_vgg16_best.params'
 default.save_prefix = 'model/faster-rcnn_vgg16'
 default.save_interval = 1
 default.log_interval = 10
-default.num_workers = 4
+default.num_workers = 25
 default.gpus = (0,)
 
 # RPN specific default settings
@@ -104,6 +104,8 @@ vgg16_fixed_params = ['vgg0_conv0_weight', 'vgg0_conv0_bias',
                       'vgg0_conv1_weight', 'vgg0_conv1_bias',
                       'vgg0_conv2_weight', 'vgg0_conv2_bias',
                       'vgg0_conv3_weight', 'vgg0_conv3_bias']
+
+mobilenet_fixed_params = []
 
 
 def generate_config(config_dict=''):
